@@ -1,0 +1,117 @@
+<!-- index.html -->
+
+<!doctype html>
+<html>
+<head>
+	<title>Angular Forms</title>
+
+	<!-- LOAD BOOTSTRAP CSS -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+
+	<!-- LOAD JQUERY -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+	<!-- PROCESS FORM WITH AJAX (OLD) -->
+	<script>
+		$(document).ready(function() {
+
+			// process the form
+			$('form').submit(function(event) {
+
+				// remove the past errors
+				$('#name-group').removeClass('has-error');
+				$('#name-group .help-block').empty();
+				$('#superhero-group').removeClass('has-error');
+				$('#superhero-group .help-block').empty();
+
+				// remove success messages
+				$('#messages').removeClass('alert alert-success').empty();
+
+				// get the form data
+				var formData = {
+					'name' 				: $('input[name=name]').val(),
+					'superheroAlias' 	: $('input[name=superheroAlias]').val()
+				};
+
+				// process the form
+				$.ajax({
+					type 		: 'POST',
+					url 		: 'process.php',
+					data 		: formData,
+					dataType 	: 'json',
+					success 	: function(data) {
+
+						// log data to the console so we can see
+						console.log(data);
+
+						// if validation fails
+						// add the error class to show a red input
+						// add the error message to the help block under the input
+						if ( ! data.success) {
+
+							if (data.errors.name) {
+								$('#name-group').addClass('has-error');
+								$('#name-group .help-block').html(data.errors.name);
+							}
+
+							if (data.errors.superheroAlias) {
+								$('#superhero-group').addClass('has-error');
+								$('#superhero-group .help-block').html(data.errors.superheroAlias);
+							}
+
+						} else {
+
+							// if validation is good add success message
+							$('#messages').addClass('alert alert-success').append('<p>' + data.message + '</p>');
+						}
+					}
+				});
+
+				// stop the form from submitting and refreshing
+				event.preventDefault();
+			});
+
+		});
+	</script>
+	<script>
+		<!-- WE WILL PROCESS OUR FORM HERE -->
+	</script>
+</head>
+<body>
+<div class="container">
+<div class="col-md-6 col-md-offset-3">
+
+	<!-- PAGE TITLE -->
+	<div class="page-header">
+		<h1><span class="glyphicon glyphicon-tower"></span> Submitting Forms with Angular</h1>
+	</div>
+
+	<!-- SHOW ERROR/SUCCESS MESSAGES -->
+	<div id="messages"></div>
+
+	<!-- FORM -->
+	<form>
+		<!-- NAME -->
+		<div id="name-group" class="form-group">
+			<label>Name</label>
+			<input type="text" name="name" class="form-control" placeholder="Bruce Wayne">
+			<span class="help-block"></span>
+		</div>
+
+		<!-- SUPERHERO NAME -->
+		<div id="superhero-group" class="form-group">
+			<label>Superhero Alias</label>
+			<input type="text" name="superheroAlias" class="form-control" placeholder="Caped Crusader">
+			<span class="help-block"></span>
+		</div>
+
+		<!-- SUBMIT BUTTON -->
+		<button type="submit" class="btn btn-success btn-lg btn-block">
+			<span class="glyphicon glyphicon-flash"></span> Submit!
+		</button>
+	</form>
+
+</div>
+</div>
+</body>
+</html>
