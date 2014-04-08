@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+	<head>
+		<title></title>
+        </head>
+	<body>
+    <script type="text/javascript">
+        window.addEventListener("message", function (event) {
+            if (event.source != window.parent) {
+                return;
+            }
+            if (!event.data.serverBound || event.data.serverBound !== "ServerBoundMessage" || !event.data.action) {
+                return;
+            }
+
+            if (event.data.action === 'getValue') {
+                
+                var vName = event.data.info;
+
+                var data = localStorage.getItem(vName);
+                window.parent.postMessage({
+                    'clientBound': "ClientBoundMessage"
+                    , 'action': 'response'
+                    , 'data': {
+                        'name': vName,
+                        'value': data
+                    }
+                    , 'mesId': event.data.mesId
+                }, '*');
+                return;
+            }
+            if (event.data.action === 'setValue') {
+
+                if (!event.data.info || !event.data.info.key) {
+                    return;
+                }
+                var vName = event.data.info.key;
+                var val = event.data.info.val;
+
+                localStorage.setItem(vName, val);
+
+                window.parent.postMessage({
+                    'clientBound': "ClientBoundMessage"
+                    , 'action': 'response'
+                    , 'data': true
+                    , 'mesId': event.data.mesId
+                }, '*');
+                return;
+            }
+
+        });
+
+		</script>
+	</body>
+</html> 
